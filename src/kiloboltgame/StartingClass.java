@@ -82,6 +82,7 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 		// main game loop
 		while (true)
 		{
+			robot.update();
 			repaint(); // calls paint, where we'll draw objects
 			try
 			{
@@ -135,12 +136,15 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 			break;
 
 		case KeyEvent.VK_LEFT:
+			robot.moveLeft();
 			break;
 
 		case KeyEvent.VK_RIGHT:
+			robot.moveRight();
 			break;
 
 		case KeyEvent.VK_SPACE:
+			robot.jump();
 			break;
 		}
 
@@ -158,9 +162,11 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 			break;
 
 		case KeyEvent.VK_LEFT:
+			robot.stop();
 			break;
 
 		case KeyEvent.VK_RIGHT:
+			robot.stop();			
 			break;
 			
 		case KeyEvent.VK_SPACE:
