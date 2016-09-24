@@ -9,6 +9,9 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -25,16 +28,19 @@ import java.util.ArrayList;
 // create a Java based applet. The purpose of this is to make it easy to embed into HTML
 public class StartingClass extends Applet implements Runnable, KeyListener
 {
-	private Robot robot;
+	private static Robot robot;
 	private Heliboy hb, hb2;
 	private Image image, currentSprite, character, character2, character3,
 			characterDown, characterJumped, background, heliboy, heliboy2,
 			heliboy3, heliboy4, heliboy5;
+	public static Image tilegrassTop, tilegrassBot, tilegrassLeft,
+			tilegrassRight, tiledirt;
 	private Graphics second; // drawing context
 	private URL base; // holds path to character asset
 	private static Background bg1, bg2; // background objects
 	private Animation anim, hanim; // Animation sequences for character and
 									// heliboy
+	private ArrayList<Tile> tilearray = new ArrayList<Tile>();
 
 	// set size, background, title
 	@Override
@@ -74,6 +80,12 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 
 		background = getImage(base, "data/background.png");
 
+		tiledirt = getImage(base, "data/tiledirt.png");
+		tilegrassTop = getImage(base, "data/tilegrasstop.png");
+		tilegrassBot = getImage(base, "data/tilegrassbot.png");
+		tilegrassLeft = getImage(base, "data/tilegrassleft.png");
+		tilegrassRight = getImage(base, "data/tilegrassright.png");
+
 		// Animation setup
 		anim = new Animation();
 		anim.addFrame(character, 1250);
@@ -94,6 +106,62 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 		currentSprite = anim.getImage();
 	}
 
+	private void initTiles()
+	{
+		// Initialize Tiles
+		try
+		{
+			loadMap("data/map1.txt");
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	//
+	// read map text file and create tiles
+	//
+	private void loadMap(String filename) throws IOException
+	{
+		ArrayList<String> lines = new ArrayList<String>();
+		int width = 0;
+		int height = 0;
+
+		BufferedReader reader = new BufferedReader(new FileReader(filename));
+		while (true)
+		{
+			String line = reader.readLine();
+			if (line == null)
+			{ // no more lines to read
+				reader.close();
+				break;
+			}
+
+			if (!line.startsWith("!"))
+			{ // ignore lines which start with !, indicating comment
+				lines.add(line);
+				width = Math.max(width, line.length());
+			}
+		}
+		height = lines.size(); // = 13
+
+		for (int j = 0; j < 12; j++)
+		{
+			String line = (String) lines.get(j);
+			for (int i = 0; i < width; i++)
+			{
+				System.out.println(i + " is i ");
+
+				if (i < line.length())
+				{
+					char ch = line.charAt(i);
+					Tile t = new Tile(i, j, Character.getNumericValue(ch));
+					tilearray.add(t);
+				}
+			}
+		}
+	}
+
 	@Override
 	// runnable method
 	public void start()
@@ -104,12 +172,14 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 		bg1 = new Background(0, 0);
 		bg2 = new Background(Background.getBgXSize(), 0);
 
+		// create robot
+		robot = new Robot();
+
+		initTiles();
+
 		// create heliboy enemies
 		hb = new Heliboy(340, 360);
 		hb2 = new Heliboy(700, 360);
-
-		// create robot
-		robot = new Robot();
 
 		Thread thread = new Thread(this);
 		thread.start(); // calls our run method
@@ -149,7 +219,7 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 			}
 
 			updateProjectiles();
-
+			updateTiles();
 			hb.update();
 			hb2.update();
 
@@ -203,8 +273,26 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 		for (int i = 0; i < projectiles.size(); i++)
 		{
 			Projectile p = projectiles.get(i);
-			g.setColor(Color.YELLOW);
-			g.fillRect(p.getX(), p.getY(), 10, 5);
+			p.draw(g);
+		}
+	}
+
+	private void updateTiles()
+	{
+		for (int i = 0; i < tilearray.size(); i++)
+		{
+			Tile t = (Tile) tilearray.get(i);
+			t.update();
+		}
+
+	}
+
+	private void paintTiles(Graphics g)
+	{
+		for (int i = 0; i < tilearray.size(); i++)
+		{
+			Tile t = (Tile) tilearray.get(i);
+			t.draw(g, this);
 		}
 	}
 
@@ -245,8 +333,11 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 				this); // observer
 
 		// draw enemies, size of 96x96
-		g.drawImage(hanim.getImage(), hb.getCenterX() - 48, hb.getCenterY() - 48, this);
-		g.drawImage(hanim.getImage(), hb2.getCenterX() - 48, hb2.getCenterY() - 48, this);
+		g.drawImage(hanim.getImage(), hb.getCenterX() - 48,
+				hb.getCenterY() - 48, this);
+		g.drawImage(hanim.getImage(), hb2.getCenterX() - 48,
+				hb2.getCenterY() - 48, this);
+		paintTiles(g);
 	}
 
 	public static Background getBg1()
@@ -307,6 +398,7 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 			if (robot.isDucked() == false && robot.isJumped() == false)
 			{
 				robot.shoot();
+				robot.setReadyToFire(false);
 			}
 			break;
 		}
@@ -338,6 +430,10 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 		case KeyEvent.VK_SPACE:
 			break;
 
+		case KeyEvent.VK_CONTROL:
+			robot.setReadyToFire(true);
+			break;
+
 		}
 	}
 
@@ -346,5 +442,10 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 	{
 		// TODO Auto-generated method stub
 
+	}
+
+	public static Robot getRobot()
+	{
+		return robot;
 	}
 }

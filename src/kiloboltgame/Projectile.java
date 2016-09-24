@@ -1,5 +1,8 @@
 package kiloboltgame;
 
+import java.awt.Color;
+import java.awt.Graphics;
+
 public class Projectile
 {
 	private int x, y, speedX;
@@ -63,6 +66,12 @@ public class Projectile
 	public void setVisible(boolean visible)
 	{
 		this.visible = visible;
+	}
+
+	public void draw(Graphics g)
+	{
+		g.setColor(Color.YELLOW);
+		g.fillRect(getX(), getY(), 10, 5);
 	}
 }
 	

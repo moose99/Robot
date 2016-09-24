@@ -9,7 +9,7 @@ public class Enemy
 	public void update()
 	{
 		centerX += speedX;
-		speedX = bg.getSpeedX();	// moves the same speed as the background
+		speedX = bg.getSpeedX()*5;	// moves 5x same speed as background
 	}
 
 	public void die()
