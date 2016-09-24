@@ -1,8 +1,10 @@
 package kiloboltgame;
 
-// import java.awt.Graphics;
+import java.util.ArrayList;
 
 //
+// The players robot object.
+// Contains a list of Projectiles
 // The Origin (0,0) pixel is at the TOP LEFT.
 //
 public class Robot
@@ -26,6 +28,8 @@ public class Robot
 	private int speedX = 0;
 	private int speedY = 1;
 
+	private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
+	
 	public void update()
 	{
 		// Moves Character or Scrolls Background accordingly.
@@ -153,6 +157,17 @@ public class Robot
 		}
 	}
 
+	// create a new projectile and add it to the list
+	public void shoot() 
+	{
+		Projectile p = new Projectile(centerX + 50, centerY - 25);
+		projectiles.add(p);
+	}
+	
+	//
+	// Getters and Setters
+	//
+	
 	public int getCenterX()
 	{
 		return centerX;
@@ -211,6 +226,11 @@ public class Robot
 	public void setSpeedY(int speedY)
 	{
 		this.speedY = speedY;
+	}
+
+	public ArrayList<Projectile> getProjectiles()
+	{
+		return projectiles;
 	}
 
 }

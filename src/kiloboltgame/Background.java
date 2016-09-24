@@ -1,5 +1,8 @@
 package kiloboltgame;
 
+//
+// A tiled background image
+//
 public class Background
 {
 	private int bgX, bgY; // background upper left
