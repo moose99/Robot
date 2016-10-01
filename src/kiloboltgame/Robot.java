@@ -1,8 +1,7 @@
 package kiloboltgame;
 
 import java.util.ArrayList;
-
-import com.sun.javafx.geom.Rectangle;
+import java.awt.Rectangle;
 
 //
 // The players robot object.

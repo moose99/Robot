@@ -2,11 +2,16 @@ package kiloboltgame;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
+
 
 public class Projectile
 {
 	private int x, y, speedX;
 	private boolean visible;
+
+	// collision rect
+	private Rectangle r;
 
 	// ctor
 	public Projectile(int startX, int startY)
@@ -15,6 +20,7 @@ public class Projectile
 		y = startY;
 		speedX = 7;
 		visible = true;
+		r = new Rectangle(0, 0, 0, 0);
 	}
 
 	//
@@ -24,8 +30,32 @@ public class Projectile
 	public void update()
 	{
 		x += speedX;
-		if (x > 800) 
-		   visible = false;
+		r.setBounds(x, y, 10, 5);
+		if (x > 800)
+		{
+			visible = false;
+			r = null;
+		}
+		if (x < 800)
+		{
+			checkCollision();
+		}
+
+	}
+
+	private void checkCollision()
+	{
+		if (r.intersects(StartingClass.hb.r))
+		{
+			visible = false;
+			StartingClass.score += 1;
+		}
+
+		if (r.intersects(StartingClass.hb2.r))
+		{
+			visible = false;
+			StartingClass.score += 1;
+		}
 	}
 
 	public int getX()
@@ -74,4 +104,3 @@ public class Projectile
 		g.fillRect(getX(), getY(), 10, 5);
 	}
 }
-	

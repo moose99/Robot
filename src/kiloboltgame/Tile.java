@@ -2,9 +2,8 @@ package kiloboltgame;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.image.ImageObserver;
-
-import com.sun.javafx.geom.Rectangle;
 
 public class Tile
 {
@@ -56,7 +55,7 @@ public class Tile
 		r.setBounds(tileX, tileY, 40, 40);
 
 		// check for collision if near the robot and not an empty tile
-		if (r.intersection(Robot.yellowRed).isEmpty() == false && type != 0)
+		if (r.intersects(Robot.yellowRed) && type != 0)
 		{
 			checkVerticalCollision(Robot.rect, Robot.rect2);
 			checkSideCollision(Robot.rect3, Robot.rect4, Robot.footleft,
@@ -101,12 +100,12 @@ public class Tile
 
 	public void checkVerticalCollision(Rectangle rtop, Rectangle rbot)
 	{
-		if (rtop.intersection(r).isEmpty() == false)
+		if (rtop.intersects(r))
 		{
 			// System.out.println("upper collision");
 		}
 
-		if (rbot.intersection(r).isEmpty() == false && type == 8 /* dirt */)
+		if (rbot.intersects(r) && type == 8 /* dirt */)
 		{
 			// System.out.println("lower collision");
 			robot.setJumped(false);
@@ -120,23 +119,23 @@ public class Tile
 	{
 		if (type != 5 && type != 2 && type != 0)
 		{
-			if (rleft.intersection(r).isEmpty() == false)
+			if (rleft.intersects(r))
 			{
 				robot.setCenterX(tileX + 102);
 				robot.setSpeedX(0);
 			} 
-			else if (leftfoot.intersection(r).isEmpty() == false)
+			else if (leftfoot.intersects(r))
 			{
 				robot.setCenterX(tileX + 85);
 				robot.setSpeedX(0);
 			}
 
-			if (rright.intersection(r).isEmpty() == false)
+			if (rright.intersects(r))
 			{
 				robot.setCenterX(tileX - 62);
 				robot.setSpeedX(0);
 			}
-			else if (rightfoot.intersection(r).isEmpty() == false)
+			else if (rightfoot.intersects(r))
 			{
 				robot.setCenterX(tileX - 45);
 				robot.setSpeedX(0);

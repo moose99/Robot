@@ -4,6 +4,7 @@ import kiloboltgame.framework.Animation;
 
 import java.applet.Applet;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -28,8 +29,14 @@ import java.util.ArrayList;
 // create a Java based applet. The purpose of this is to make it easy to embed into HTML
 public class StartingClass extends Applet implements Runnable, KeyListener
 {
+	enum GameState
+	{
+		Running, Dead
+	}
+
+	GameState state = GameState.Running;
 	private static Robot robot;
-	private Heliboy hb, hb2;
+	public static Heliboy hb, hb2;
 	private Image image, currentSprite, character, character2, character3,
 			characterDown, characterJumped, background, heliboy, heliboy2,
 			heliboy3, heliboy4, heliboy5;
@@ -41,6 +48,9 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 	private Animation anim, hanim; // Animation sequences for character and
 									// heliboy
 	private ArrayList<Tile> tilearray = new ArrayList<Tile>();
+
+	public static int score = 0;
+	private Font font = new Font(null, Font.BOLD, 30);
 
 	// set size, background, title
 	@Override
@@ -208,35 +218,46 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 	public void run()
 	{
 		// main game loop
-		while (true)
+		if (state == GameState.Running)
 		{
-			// update objects
-			robot.update();
-			if (robot.isDucked() == false && robot.isJumped() == false)
+			while (true)
 			{
-				currentSprite = anim.getImage(); // get current image from from
-													// character animation
-			}
+				// update objects
+				robot.update();
+				if (robot.isDucked() == false && robot.isJumped() == false)
+				{
+					currentSprite = anim.getImage(); // get current image from
+														// from
+														// character animation
+				}
 
-			updateProjectiles();
-			updateTiles();
-			hb.update();
-			hb2.update();
+				updateProjectiles();
+				updateTiles();
+				hb.update();
+				hb2.update();
 
-			bg1.update();
-			bg2.update();
+				bg1.update();
+				bg2.update();
 
-			animate();
+				animate();
 
-			// draw objects
-			repaint(); // calls paint, where we'll draw objects
+				// draw objects
+				repaint(); // calls paint, where we'll draw objects
 
-			try
-			{
-				Thread.sleep(17); // don't go faster than 60 fps
-			} catch (InterruptedException e)
-			{ // in case sleep fails
-				e.printStackTrace();
+				try
+				{
+					Thread.sleep(17); // don't go faster than 60 fps
+				} catch (InterruptedException e)
+				{ // in case sleep fails
+					e.printStackTrace();
+				}
+
+				// fell off the world
+				if (robot.getCenterY() > 500)
+				{
+					state = GameState.Dead;
+				}
+
 			}
 		}
 	}
@@ -320,31 +341,50 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 	//
 	public void paint(Graphics g)
 	{
-		// draw background images
-		g.drawImage(background, bg1.getBgX(), bg1.getBgY(), this);
-		g.drawImage(background, bg2.getBgX(), bg2.getBgY(), this);
+		if (state == GameState.Running)
+		{
 
-		// draw projectiles
-		paintProjectiles(g);
+			// draw background images
+			g.drawImage(background, bg1.getBgX(), bg1.getBgY(), this);
+			g.drawImage(background, bg2.getBgX(), bg2.getBgY(), this);
 
-/*
- 		// draw robot collision bounds
- 
-		g.drawRect((int)Robot.rect.x, (int)Robot.rect.y, (int)Robot.rect.width, (int)Robot.rect.height);
-		g.drawRect((int)Robot.rect2.x, (int)Robot.rect2.y, (int)Robot.rect2.width, (int)Robot.rect2.height);
-*/
-		
-		// draw robot
-		g.drawImage(currentSprite, // image
-				robot.getCenterX() - 61, robot.getCenterY() - 63, // x, y
-				this); // observer
+			paintTiles(g);
 
-		// draw enemies, size of 96x96
-		g.drawImage(hanim.getImage(), hb.getCenterX() - 48,
-				hb.getCenterY() - 48, this);
-		g.drawImage(hanim.getImage(), hb2.getCenterX() - 48,
-				hb2.getCenterY() - 48, this);
-		paintTiles(g);
+			// draw projectiles
+			paintProjectiles(g);
+
+			/*
+			 * // draw robot collision bounds
+			 * 
+			 * g.drawRect((int)Robot.rect.x, (int)Robot.rect.y,
+			 * (int)Robot.rect.width, (int)Robot.rect.height);
+			 * g.drawRect((int)Robot.rect2.x, (int)Robot.rect2.y,
+			 * (int)Robot.rect2.width, (int)Robot.rect2.height);
+			 */
+
+			// draw robot
+			g.drawImage(currentSprite, // image
+					robot.getCenterX() - 61, robot.getCenterY() - 63, // x, y
+					this); // observer
+
+			// draw enemies, size of 96x96
+			g.drawImage(hanim.getImage(), hb.getCenterX() - 48,
+					hb.getCenterY() - 48, this);
+			g.drawImage(hanim.getImage(), hb2.getCenterX() - 48,
+					hb2.getCenterY() - 48, this);
+
+			// draw score
+			g.setFont(font);
+			g.setColor(Color.WHITE);
+			g.drawString(Integer.toString(score), 740, 30);
+		} else 
+		if (state == GameState.Dead)
+		{
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, 800, 480);
+			g.setColor(Color.WHITE);
+			g.drawString("Dead", 360, 240);
+		}
 	}
 
 	public static Background getBg1()
