@@ -327,6 +327,13 @@ public class StartingClass extends Applet implements Runnable, KeyListener
 		// draw projectiles
 		paintProjectiles(g);
 
+/*
+ 		// draw robot collision bounds
+ 
+		g.drawRect((int)Robot.rect.x, (int)Robot.rect.y, (int)Robot.rect.width, (int)Robot.rect.height);
+		g.drawRect((int)Robot.rect2.x, (int)Robot.rect2.y, (int)Robot.rect2.width, (int)Robot.rect2.height);
+*/
+		
 		// draw robot
 		g.drawImage(currentSprite, // image
 				robot.getCenterX() - 61, robot.getCenterY() - 63, // x, y

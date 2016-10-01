@@ -2,6 +2,8 @@ package kiloboltgame;
 
 import java.util.ArrayList;
 
+import com.sun.javafx.geom.Rectangle;
+
 //
 // The players robot object.
 // Contains a list of Projectiles
@@ -21,7 +23,7 @@ public class Robot
 	private boolean movingRight = false;
 	private boolean ducked = false;
 	private boolean readyToFire = true;
-	
+
 	public boolean isReadyToFire()
 	{
 		return readyToFire;
@@ -38,8 +40,21 @@ public class Robot
 	private int speedX = 0;
 	private int speedY = 0;
 
+	// collision detection bounds
+	public static Rectangle rect = new Rectangle(0, 0, 0, 0); // vert bounds
+	public static Rectangle rect2 = new Rectangle(0, 0, 0, 0); // vert bounds
+	public static Rectangle rect3 = new Rectangle(0, 0, 0, 0); // horiz bounds
+	public static Rectangle rect4 = new Rectangle(0, 0, 0, 0); // horiz bounds
+	public static Rectangle yellowRed = new Rectangle(0, 0, 0, 0); // bounds of
+																	// nearby
+																	// tiles to
+																	// collide
+																	// with
+	public static Rectangle footleft = new Rectangle(0, 0, 0, 0);
+	public static Rectangle footright = new Rectangle(0, 0, 0, 0);
+
 	private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
-	
+
 	public void update()
 	{
 		// Moves Character or Scrolls Background accordingly.
@@ -58,25 +73,35 @@ public class Robot
 			centerX += speedX;
 		}
 		if (speedX > 0 && centerX > 200)
-		{	// move background at 1/5 speed of character
-			bg1.setSpeedX(-MOVESPEED/5);
-			bg2.setSpeedX(-MOVESPEED/5);
+		{ // move background at 1/5 speed of character
+			bg1.setSpeedX(-MOVESPEED / 5);
+			bg2.setSpeedX(-MOVESPEED / 5);
 		}
 
 		// Updates Y Position
 		centerY += speedY;
 
 		// Handles Jumping
-		if (jumped == true)
-		{
-			speedY += 1;
-		}
+		speedY += 1;
+		if (speedY > 3)
+			jumped = true;
 
 		// Prevents going beyond X coordinate of 0
 		if (centerX + speedX <= 60)
 		{
 			centerX = 61;
 		}
+
+		// update collision rects
+		rect.setBounds(centerX - 34, centerY - 63, 68, 63); // vert
+		rect2.setBounds(rect.x, rect.y + 63, 68, 64); // vert
+		rect3.setBounds(rect.x - 26, rect.y + 32, 26, 20); // horiz
+		rect4.setBounds(rect.x + 68, rect.y + 32, 26, 20); // horiz
+		yellowRed.setBounds(centerX - 110, centerY - 110, 180, 180); // nearby
+																		// tiles
+																		// area
+		footleft.setBounds(centerX - 50, centerY + 20, 50, 15);
+		footright.setBounds(centerX, centerY + 20, 50, 15);
 	}
 
 	public void moveRight()
@@ -156,7 +181,7 @@ public class Robot
 	}
 
 	// create a new projectile and add it to the list
-	public void shoot() 
+	public void shoot()
 	{
 		if (readyToFire)
 		{
@@ -164,11 +189,11 @@ public class Robot
 			projectiles.add(p);
 		}
 	}
-	
+
 	//
 	// Getters and Setters
 	//
-	
+
 	public int getCenterX()
 	{
 		return centerX;
