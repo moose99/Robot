@@ -4,16 +4,19 @@ import java.awt.Rectangle;
 
 public class Enemy
 {
-	private int maxHealth, currentHealth, power, speedX, centerX, centerY;
+	private int power, speedX, centerX, centerY;
 	private Background bg = StartingClass.getBg1();
-
+	private Robot robot = StartingClass.getRobot();
+	public int health = 5;
+	private int movementSpeed;
 	public Rectangle r = new Rectangle(0, 0, 0, 0);
 
 	// Behavioral Methods
 	public void update()
 	{
+		follow();
 		centerX += speedX;
-		speedX = bg.getSpeedX() * 5; // moves 5x same speed as background
+		speedX = bg.getSpeedX() * 5 + movementSpeed;
 
 		r.setBounds(centerX - 25, centerY - 25, 50, 60);
 
@@ -21,6 +24,33 @@ public class Enemy
 		if (r.intersects(Robot.yellowRed))
 		{
 			checkCollision();
+		}
+
+	}
+
+	private void follow()
+	{
+
+		if (centerX < -95 || centerX > 810)
+		{
+			movementSpeed = 0;
+		}
+
+		else if (Math.abs(robot.getCenterX() - centerX) < 5)
+		{
+			movementSpeed = 0;
+		}
+
+		else
+		{
+
+			if (robot.getCenterX() >= centerX)
+			{
+				movementSpeed = 1;
+			} else
+			{
+				movementSpeed = -1;
+			}
 		}
 
 	}
@@ -45,25 +75,6 @@ public class Enemy
 	//
 	// getters and setters
 	//
-	public int getMaxHealth()
-	{
-		return maxHealth;
-	}
-
-	public void setMaxHealth(int maxHealth)
-	{
-		this.maxHealth = maxHealth;
-	}
-
-	public int getCurrentHealth()
-	{
-		return currentHealth;
-	}
-
-	public void setCurrentHealth(int currentHealth)
-	{
-		this.currentHealth = currentHealth;
-	}
 
 	public int getPower()
 	{
